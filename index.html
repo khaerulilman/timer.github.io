@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15 Minute Timer</title>
+    <style>
+        .timer {
+            font-size: 2em;
+            text-align: center;
+            margin-top: 20%;
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .controls button {
+            font-size: 1em;
+            padding: 10px 20px;
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="timer" id="timer">15:00</div>
+    <div class="controls">
+        <button id="startButton">Start Timer</button>
+        <button id="resetButton">Reset Timer</button>
+    </div>
+
+    <script>
+        const timerElement = document.getElementById('timer');
+        const startButton = document.getElementById('startButton');
+        const resetButton = document.getElementById('resetButton');
+        const duration = 15 * 60; // 15 minutes in seconds
+        const localStorageKey = 'startTime';
+        let interval;
+
+        function startTimer() {
+            let startTime = localStorage.getItem(localStorageKey);
+
+            if (!startTime) {
+                startTime = new Date().getTime();
+                localStorage.setItem(localStorageKey, startTime);
+            }
+
+            updateTimer();
+            interval = setInterval(updateTimer, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(interval);
+            localStorage.removeItem(localStorageKey);
+            timerElement.textContent = '15:00';
+        }
+
+        function updateTimer() {
+            const startTime = localStorage.getItem(localStorageKey);
+
+            if (!startTime) {
+                timerElement.textContent = '15:00';
+                clearInterval(interval);
+                return;
+            }
+
+            const now = new Date().getTime();
+            const elapsedTime = Math.floor((now - startTime) / 1000);
+            const remainingTime = duration - elapsedTime;
+
+            if (remainingTime <= 0) {
+                timerElement.textContent = '00:00';
+                clearInterval(interval);
+                localStorage.removeItem(localStorageKey);
+            } else {
+                const minutes = Math.floor(remainingTime / 60);
+                const seconds = remainingTime % 60;
+                timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+        }
+
+        startButton.addEventListener('click', startTimer);
+        resetButton.addEventListener('click', resetTimer);
+
+        // Initialize timer on page load
+        if (localStorage.getItem(localStorageKey)) {
+            startTimer();
+        }
+    </script>
+</body>
+
+</html>
